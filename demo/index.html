@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>MediaElement.js 3.0 - audio/video unification library</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+    <link rel="stylesheet" href="../build/mediaelementplayer.css">
+
+<style>
+	
+	
+	 html, body {
+            overflow-x: hidden;
+        }
+
+        #container {
+            padding: 0 20px 50px;
+        }
+        .error {
+            color: red;
+        }
+        a {
+            word-wrap: break-word;
+        }
+
+        code {
+            font-size: 0.8em;
+        }
+
+        #player2-container .mejs__time-buffering, #player2-container .mejs__time-current, #player2-container .mejs__time-handle,
+        #player2-container .mejs__time-loaded, #player2-container .mejs__time-hovered, #player2-container .mejs__time-marker, #player2-container .mejs__time-total {
+            height: 2px;
+        }
+
+        #player2-container .mejs__time-total {
+            margin-top: 9px;
+        }
+        #player2-container .mejs__time-handle {
+            left: -5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ffffff;
+            top: -5px;
+            cursor: pointer;
+            display: block;
+            position: absolute;
+            z-index: 2;
+            border: none;
+        }
+        #player2-container .mejs__time-handle-content {
+            top: 0;
+            left: 0;
+            width: 12px;
+            height: 12px;
+        }
+	
+	
+	
+	@import url('https://fonts.googleapis.com/css?family=Work+Sans:300,400,500,600,700');
+body {
+  padding: 50px 30px;
+  background: #f5f5f5;
+  font-family: 'Work Sans', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: #333;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+a {
+  text-decoration: none;
+  color: inherit;
+}
+a:visited {
+  color: inherit;
+}
+.title {
+  font-size: 22px;
+  font-weight: 600;
+  margin-top: 25px;
+  margin-bottom: 0px;
+}
+.card {
+  background: #fff;
+  padding: 0px 20px 0 0;
+  position: relative;
+  box-shadow: 2px 2px 50px rgba(0, 0, 0, 0.2);
+  max-width: 700px;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+  flex-wrap: nowrap;
+  margin-bottom: 30px;
+}
+img {
+  width: 100px;
+}
+.description {
+  border-bottom: 3px solid #424242;
+}
+.date {
+  font-size: 13px;
+  color: #9e9e9e;
+  display: inline;
+}
+.controls {
+  display: inline-block;
+  margin: 5px;
+}
+.text {
+  width: 500px;
+}
+.thumbnail {
+  width: 100px;
+  padding: 20px;
+  display: grid;
+  align-items: center;
+  justify-content: center;
+}
+@media screen and (max-width: 768px) {
+  .card {
+    flex-wrap: wrap;
+    padding: 0;
+  }
+  .thumbnail {
+    width: 100%;
+    padding-bottom: 0;
+  }
+  .text {
+    padding: 0px 20px;
+    width: 100%;
+  }
+  img {
+    width: 100%;
+    max-width: 300px;
+  }
+}
+
+	</style>
+	
+</head>
+
+<body>
+    <div id="playlist-container">
+
+        <section style="display: none;">
+            <h3>Global Options</h3> 
+            <form action="#" method="get">
+                <label>Language <select name="lang">
+
+                </select> 
+                </label>
+                <label>Stretching (Video Only)<select name="stretching">
+                    <option value="auto" selected>Auto (default)</option>
+                    <option value="responsive">Responsive</option>
+                    <option value="fill" selected>Fill</option>
+                    <option value="none" selected>None (original dimensions)</option>
+                </select>
+                </label>
+            </form>
+        </section>
+         
+	</div>   
+   
+   
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        
+   <script src="http://yui.yahooapis.com/3.18.1/build/yui/yui-min.js"></script>
+    <script src="../build/mediaelement-and-player.js"></script>
+
+
+    <script src="demo.js"></script>
+    
+    
+    <script>
+YUI().use('yql', function(Y){
+    var query = 'select * from rss(0,5) where url = "https://edgeofaging.libsyn.com/rss"'
+    var q = Y.YQL(query, function(r){
+        //r now contains the result of the YQL Query as a JSON
+        var feed = r.query.results.item // get feed as array of entries
+      var playlist = [];	
+		
+		for (var i=0; i<feed.length; i++){
+	 
+			var item = feed[i]; //LOOP THROUGH 
+         
+  $("#playlist-container").append("<div class='card'><div class='thumbnail'><img src=''></div> <div class='text'> <p class='title' id='title" +i + "'></p><p class='description' id='description" +i + "'></p><p class='date' id='date" +i + "'></p><audio class='mejs__player' preload='none' controls style='max-width:100%;'><source id='player" + i + "' src='' type='audio/mp3'></audio></div></div>") //ADD A CARD EACH LOOP
+			
+		   	var pubDate = item.pubDate; 
+        var date = pubDate.slice(0, 10);
+		    $("#date"+i).html("Published: " + date);
+			$("#title"+i).html('<a href="'+ item.link + '">'+item.title+'</a>'); 
+	   	  $("#description"+i).html(item.description);
+			var thumb = item.image.href;
+			$("img").attr("src",thumb)
+		    var link = item.enclosure.url;
+	         var file = (link.split("?dest")[0]); 
+			$("#player" + i).attr("src",file); 
+				playlist.push(file);    
+console.log(r) 
+					 
+		}  //end for loops 
+				
+console.log(feed)
+		  for(var i in feed) {
+			var thumb = feed.image;
+			$("img").attr("src",thumb)
+		} //end img for
+
+		
+		
+    });
+});
+</script>
+
+</body>
+</html>
